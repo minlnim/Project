@@ -758,7 +758,8 @@ resource "kubernetes_service" "backend" {
   }
 
   depends_on = [
-    kubernetes_deployment.backend
+    kubernetes_config_map.backend,
+    kubernetes_secret.backend
   ]
 }
 
