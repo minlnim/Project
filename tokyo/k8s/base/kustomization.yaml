@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+# Terraform에서 관리하는 리소스:
+# - ConfigMap (kubernetes_config_map.backend)
+# - Secret (kubernetes_secret.backend)
+# - Deployment (kubernetes_deployment.backend)
+# - Service (kubernetes_service.backend)
+# - TargetGroupBinding (Terraform이 직접 생성하지는 않지만 AWS Load Balancer Controller가 처리)
+
+# K8s로 관리하는 리소스 (필요한 경우만)
+resources:
+  - namespace.yaml
+  # - targetgroupbinding.yaml  # Terraform에서 kubernetes_manifest로 관리
+
+# Common labels for all resources
+commonLabels:
+  app.kubernetes.io/name: tokyo-portal
+  app.kubernetes.io/component: backend
+  app.kubernetes.io/managed-by: terraform
+
+# Common annotations
+commonAnnotations:
+  description: "Tokyo Portal Backend Application - Managed by Terraform"

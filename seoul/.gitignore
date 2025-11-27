@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/*.tfstate.*.backup
+infra/terraform/tfplan
+infra/terraform/.terraform.lock.hcl
+infra/terraform/.terraform.tfstate.lock.info
+
+# AWS
+*.pem
+
+# Temp files
+*.zip
+*.log
+*-config.json
+update-cloudfront.py
+
+# Build artifacts
+dist/
+build/

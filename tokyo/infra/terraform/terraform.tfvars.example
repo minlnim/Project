@@ -1,0 +1,70 @@
+# Seoul Portal – terraform.tfvars 예시
+
+# ===== 네트워크 =====
+vpc_id      = "vpc-0ed96f16d7a1c201b"
+vpc_cidr    = "20.0.0.0/16"
+
+private_subnet_ids = [
+  # 예: EKS / Backend용 Private Subnet IDs
+  "subnet-07ef92ca57b27667b",
+  "subnet-0decc928be8ee6c4a",
+]
+
+public_subnet_ids = [
+  # 예: Elastic Beanstalk ALB용 Public Subnet IDs
+  "subnet-XXXXXXXX",
+  "subnet-YYYYYYYY",
+]
+
+db_subnet_ids = [
+  "subnet-07ef92ca57b27667b",
+  "subnet-0decc928be8ee6c4a",
+]
+
+# ===== Beanstalk / CloudFront =====
+beanstalk_env_cname = "seoul-webapp-env.eba-ztq5m3vp.ap-northeast-2.elasticbeanstalk.com"
+
+# us-east-1 ACM 인증서 ARN (커스텀 도메인 사용 시)
+cloudfront_acm_certificate_arn = ""
+
+# Route53에 매핑할 도메인 (선택)
+cloudfront_custom_domain = "" # 예: "portal.example.com"
+
+# ===== Cognito =====
+cognito_domain_prefix = "corp-portal-seoul-demo"
+
+# 로그인/로그아웃 URL (CloudFront 도메인 기준으로 설정)
+# 실제 적용 시, terraform apply 이후 출력되는 cloudfront_domain_name을 사용해서 수정
+cognito_callback_urls = [
+  "https://YOUR-CF-DOMAIN/callback"
+]
+
+cognito_logout_urls = [
+  "https://YOUR-CF-DOMAIN/"
+]
+
+# ===== Backend / RDS =====
+backend_port = 8080
+
+db_engine           = "postgres"
+db_engine_version   = "14.11"
+db_instance_class   = "db.t3.micro"
+db_allocated_storage = 20
+
+db_username = "portaluser"
+db_password = "CHANGE_ME_STRONG_PASSWORD"
+db_name     = "corpportal"
+db_port     = 5432
+
+# ===== ArgoCD =====
+# ArgoCD 도메인 (선택사항)
+argocd_domain = "" # 예: "argocd.example.com"
+
+# Git Repository 설정
+argocd_repo_url    = "" # 예: "https://github.com/your-org/your-repo.git"
+argocd_repo_branch = "main"
+argocd_backend_path = "k8s"
+
+# Private Repository 접근 (필요시)
+argocd_repo_username = ""
+argocd_repo_password = ""

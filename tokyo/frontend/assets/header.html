@@ -1,0 +1,57 @@
+<div class="header-wrapper">
+  <header>
+    <div class="brand">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+          <path d="M16 8L20 12H12L16 8Z" fill="white"/>
+          <rect x="12" y="14" width="8" height="10" rx="1" fill="white"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#36b866"/>
+              <stop offset="1" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>천상연 그룹웨어</h1>
+        <span class="brand-subtitle">통합 업무 시스템</span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="user-info">
+        <span class="user-name" id="who"></span>
+        <span class="user-status" id="env">READY</span>
+      </div>
+      <button class="btn btn-primary" id="btnLogin">로그인</button>
+      <button class="btn btn-ghost hidden" id="btnLogout">로그아웃</button>
+    </div>
+  </header>
+  <nav class="nav" id="nav">
+    <a href="home.html" data-tab="home">
+      <span class="nav-icon">🏠</span>
+      <span>홈</span>
+    </a>
+    <a href="calendar.html" data-tab="calendar">
+      <span class="nav-icon">📅</span>
+      <span>달력</span>
+    </a>
+    <a href="notices.html" data-tab="notices">
+      <span class="nav-icon">📢</span>
+      <span>공지사항</span>
+    </a>
+    <a href="org.html" data-tab="org">
+      <span class="nav-icon">👥</span>
+      <span>조직도</span>
+    </a>
+    <a href="email.html" data-tab="email">
+      <span class="nav-icon">✉️</span>
+      <span>이메일</span>
+    </a>
+    <a href="approvals.html" data-tab="approvals">
+      <span class="nav-icon">✅</span>
+      <span>결재</span>
+    </a>
+  </nav>
+</div>

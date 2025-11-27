@@ -1,0 +1,100 @@
+name: Deploy Tokyo Backend & Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tokyo/backend/**'
+      - 'tokyo/frontend/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-1
+  AWS_ACCOUNT_ID: 299145660695
+  EKS_CLUSTER_NAME: tokyo-portal-tokyo-eks
+  ECR_BACKEND_REPO: tokyo-portal-tokyo-backend
+  ECR_FRONTEND_REPO: tokyo-portal-tokyo-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Backend image
+        working-directory: ./tokyo/backend
+        run: |
+          docker build -t ${{ env.ECR_BACKEND_REPO }} .
+          docker tag ${{ env.ECR_BACKEND_REPO }}:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPO }}:latest
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPO }}:latest
+
+      - name: Build and push Frontend image
+        working-directory: ./tokyo/frontend
+        run: |
+          docker build -t ${{ env.ECR_FRONTEND_REPO }} .
+          docker tag ${{ env.ECR_FRONTEND_REPO }}:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_FRONTEND_REPO }}:latest
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_FRONTEND_REPO }}:latest
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+      - name: Deploy Backend to EKS
+        run: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: backend
+            namespace: default
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: backend
+            template:
+              metadata:
+                labels:
+                  app: backend
+              spec:
+                containers:
+                - name: backend
+                  image: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPO }}:latest
+                  ports:
+                  - containerPort: 8080
+                  envFrom:
+                  - configMapRef:
+                      name: backend-config
+                  - secretRef:
+                      name: backend-secret
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "200m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+          EOF
+
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/backend -n default --timeout=5m
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n default
+          kubectl get svc -n default

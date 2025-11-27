@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="ko">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>사내 포털 - 달력</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div id="header"></div>
+    <section class="panel card">
+      <h2>내 달력</h2>
+      <div class="row grid-2">
+        <div>
+          <div class="field grid-3">
+            <input class="input" id="calTitle" placeholder="제목" />
+            <input class="input" id="calStart" type="datetime-local" />
+            <input class="input" id="calEnd" type="datetime-local" />
+          </div>
+          <div class="toolbar">
+            <button class="btn brand" id="btnAddEvent">이벤트 추가</button>
+            <span class="muted">단축키: <span class="kbd">E</span> 새 이벤트</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>다가오는 일정</h2>
+          <table class="table" id="calTable"><thead><tr><th>시작</th><th>끝</th><th>제목</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script type="module">
+    import { requireAuth, api, fmt, toast, $ } from "./assets/app.js";
+    import { loadHeader } from "./assets/header.js";
+    requireAuth(); await loadHeader("calendar");
+    async function refresh(){
+      try{
+        const data = await api('/calendar/my');
+        const tbody = document.querySelector('#calTable tbody');
+        tbody.innerHTML='';
+        data.forEach(ev=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML=`<td>${fmt(ev.start)}</td><td>${fmt(ev.end)}</td><td>${ev.title}</td>
+            <td><button class="btn ghost" data-id="${ev.id}">삭제</button></td>`;
+          tbody.appendChild(tr);
+        });
+        tbody.onclick = async (e)=>{
+          if(e.target.tagName==='BUTTON'){
+            await api(`/calendar/${e.target.dataset.id}`, {method:'DELETE'});
+            toast('삭제됨'); refresh();
+          }
+        };
+      }catch(e){
+        toast('가져오기 실패');
+      }
+    }
+    document.getElementById('btnAddEvent').addEventListener('click', async ()=>{
+      const title = $('#calTitle').value.trim();
+      const start = $('#calStart').value; const end = $('#calEnd').value;
+      if(!title||!start||!end) return toast('입력값 확인');
+      await api('/calendar', {method:'POST', body:JSON.stringify({title,start,end})});
+      toast('추가됨'); refresh();
+    });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='e'||e.key==='E'){ $('#calTitle').focus(); }});
+    refresh();
+  </script>
+</body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>로그인 - 사내 포털 v1.7</title>
+<script src="./env-config.js"></script>
+<link rel="stylesheet" href="./assets/styles.css" />
+<style>
+  body { background:#ffffff; color:#000000; font-family: Inter, system-ui, sans-serif; }
+  .login-wrap { max-width:1100px; margin:0 auto; padding:32px 20px; }
+  .card-login { background:#ffffff; border:1px solid #000000; border-radius:16px; padding:32px; max-width:420px; margin:40px auto; }
+  .card-login h2 { font-size:24px; font-weight:600; margin-bottom:8px; }
+  .card-login p.desc { font-size:14px; color:#000000; margin-bottom:20px; }
+  .input-box { width:100%; padding:12px 14px; margin-top:10px; border-radius:10px; border:1px solid #000000; background:#ffffff; color:#000000; font-size:15px; }
+  .btn-login { width:100%; padding:12px; margin-top:20px; background:#c2c2c2; border:1px solid #000000; border-radius:10px; color:#000000; cursor:pointer; font-size:15px; }
+  .demo-tip { margin-top:16px; font-size:13px; color:#000000; }
+  header { padding:20px; display:flex; align-items:center; gap:10px; }
+  .logo-box { width:36px; height:36px; border-radius:8px; background:#93bcff; display:grid; place-items:center; color:white; font-weight:bold; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-box">HM</div>
+  <div style="font-size:18px; font-weight:600;">HM</div>
+</header>
+<div class="login-wrap">
+  <div class="card-login">
+    <h2>로그인</h2>
+    <p>  </p>
+    <form id="loginForm">
+      <label>아이디</label>
+      <input id="username" class="input-box" required />
+         <p>  </p>
+      <label style="margin-top:12px;">비밀번호</label>
+      <input id="password" class="input-box" type="password" required />
+               <p>  </p>
+      <button class="btn-login" type="submit">로그인</button>
+    </form>
+    <div class="demo-tip">ex) admin / 1234</div>
+  </div>
+</div>
+<script type="module">
+  import { login, setTokens } from "./assets/app.js";
+  const form = document.getElementById("loginForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await login(
+        document.getElementById("username").value.trim(),
+        document.getElementById("password").value
+      );
+      location.href = "home.html";
+    } catch (err) {
+      alert("로그인 실패");
+    }
+  });
+</script>
+</body>
+</html>

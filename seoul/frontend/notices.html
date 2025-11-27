@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="ko">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>사내 포털 - 공지사항</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div id="header"></div>
+    <section class="panel card">
+      <h2>공지사항</h2>
+      <div class="field grid-3">
+        <input class="input" id="noticeTitle" placeholder="제목" />
+        <input class="input" id="noticeCategory" placeholder="카테고리" />
+        <input class="input" id="noticePinned" placeholder="상단고정? true/false" />
+      </div>
+      <div class="field"><textarea class="input" id="noticeBody" rows="4" placeholder="내용"></textarea></div>
+      <div class="toolbar"><button class="btn brand" id="btnPublish">등록</button></div>
+      <table class="table" id="noticeTable"><thead><tr><th>제목</th><th>카테고리</th><th>작성자</th><th>작성일</th></tr></thead><tbody></tbody></table>
+    </section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script type="module">
+    import { requireAuth, api, fmt, toast } from "./assets/app.js";
+    import { loadHeader } from "./assets/header.js";
+    requireAuth(); await loadHeader("notices");
+    async function refresh(){
+      const data = await api('/notices');
+      const tbody = document.querySelector('#noticeTable tbody'); tbody.innerHTML='';
+      data.forEach(n=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${n.title}</td><td>${n.category||''}</td><td>${n.author||''}</td><td>${fmt(n.created_at)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    document.getElementById('btnPublish').addEventListener('click', async ()=>{
+      const title=document.getElementById('noticeTitle').value.trim();
+      const body =document.getElementById('noticeBody').value.trim();
+      const category=document.getElementById('noticeCategory').value.trim();
+      const pinned = (document.getElementById('noticePinned').value.trim()==='true');
+      if(!title||!body) return toast('제목/내용 필요');
+      await api('/notices', {method:'POST', body:JSON.stringify({title,body,category,pinned})});
+      toast('등록됨'); refresh();
+    });
+    refresh();
+  </script>
+</body></html>
