@@ -40,6 +40,15 @@ provider "aws" {
 # Get current AWS account ID
 data "aws_caller_identity" "current" {}
 
+# Wait for EKS cluster to be fully ready
+resource "null_resource" "wait_for_cluster" {
+  depends_on = [module.eks]
+
+  provisioner "local-exec" {
+    command = "echo EKS cluster is ready"
+  }
+}
+
 # Kubernetes provider configuration
 provider "kubernetes" {
   host                   = try(module.eks.cluster_endpoint, "")
