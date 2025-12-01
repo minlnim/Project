@@ -44,6 +44,21 @@ spec:
             secretKeyRef:
               name: backend-secret
               key: DB_PASSWORD
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: AWS_REGION
+        - name: COGNITO_USER_POOL_ID
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: COGNITO_USER_POOL_ID
+        - name: COGNITO_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: COGNITO_CLIENT_ID
         resources:
           requests:
             cpu: 250m

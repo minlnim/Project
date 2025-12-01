@@ -5,7 +5,7 @@ metadata:
   namespace: default
 data:
   DB_HOST: "aurora-global-seoul-writer.czky26wqm1co.ap-northeast-2.rds.amazonaws.com"
-  DB_PORT: "5432"
+  DB_PORT: "3306"
   DB_NAME: "corpportal"
   AWS_REGION: "ap-northeast-2"
   COGNITO_USER_POOL_ID: "ap-northeast-2_e5tqVVahP"
