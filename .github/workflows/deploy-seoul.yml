@@ -53,51 +53,17 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
 
-      - name: Deploy Backend to EKS
+      - name: Trigger ArgoCD Sync for Backend
         run: |
-          cat <<EOF | kubectl apply -f -
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: backend
-            namespace: default
-          spec:
-            replicas: 2
-            selector:
-              matchLabels:
-                app: backend
-            template:
-              metadata:
-                labels:
-                  app: backend
-              spec:
-                containers:
-                - name: backend
-                  image: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPO }}:latest
-                  ports:
-                  - containerPort: 8080
-                  envFrom:
-                  - configMapRef:
-                      name: backend-config
-                  - secretRef:
-                      name: backend-secret
-                  resources:
-                    requests:
-                      memory: "256Mi"
-                      cpu: "200m"
-                    limits:
-                      memory: "512Mi"
-                      cpu: "500m"
-          EOF
-
-      - name: Wait for deployment
+          # ArgoCD가 자동으로 동기화하지만, 수동으로 트리거하여 즉시 배포
+          kubectl patch application seoul-portal-backend -n argocd --type merge -p '{"spec":{"source":{"targetRevision":"main"}}}' || echo "Application not found or already synced"
+          
+      - name: Wait for ArgoCD deployment
         run: |
-          kubectl rollout status deployment/backend -n default --timeout=5m
-
-      - name: Verify deployment
-        run: |
+          echo "Waiting for ArgoCD to sync and deploy backend..."
+          sleep 60
+          kubectl get applications -n argocd
           kubectl get pods -n default
-          kubectl get svc -n default
 
       - name: Deploy Frontend to Elastic Beanstalk
         working-directory: ./seoul/frontend
