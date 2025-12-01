@@ -1,7 +1,7 @@
 # Tokyo Portal – terraform.tfvars 예시
 
 # ===== AWS 계정 =====
-aws_account_id = "299145660695"
+aws_account_id = "150502622488"
 
 # ===== 네트워크 =====
 # VPC를 새로 생성하려면 vpc_id를 빈 문자열로 설정
@@ -107,7 +107,7 @@ db_port              = 5432
 # ===== ArgoCD =====
 # GitOps 배포를 사용하려면 true로 설정
 # 주의: EKS 클러스터가 생성된 후에만 true로 설정하세요
-enable_argocd = true
+enable_argocd = false
 
 # ArgoCD 도메인 (선택사항)
 argocd_domain = "" # 예: "argocd.example.com"
@@ -123,4 +123,4 @@ argocd_repo_password = ""
 
 # ===== CloudFront =====
 # 기존 CloudFront Distribution ID (빈 문자열이면 새로 생성하지 않음)
-existing_cloudfront_id = "ECZLGZT9P6MSJ"
+existing_cloudfront_id = "E152R78VFY6VWL"

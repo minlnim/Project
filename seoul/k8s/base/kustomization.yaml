@@ -3,24 +3,29 @@ kind: Kustomization
 
 namespace: default
 
-# Terraform에서 관리하는 리소스:
-# - ConfigMap (kubernetes_config_map.backend)
-# - Secret (kubernetes_secret.backend)
-# - Deployment (kubernetes_deployment.backend)
-# - Service (kubernetes_service.backend)
-# - TargetGroupBinding (Terraform이 직접 생성하지는 않지만 AWS Load Balancer Controller가 처리)
-
-# K8s로 관리하는 리소스 (필요한 경우만)
 resources:
+<<<<<<< Updated upstream
 - namespace.yaml
 - configmap.yaml
 - secret.yaml
 - deployment.yaml
 - service.yaml
+=======
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+>>>>>>> Stashed changes
+
+# 이미지 태그를 동적으로 업데이트 (GitHub Actions에서 수행)
+images:
+  - name: 299145660695.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
+    newTag: latest  # CI/CD에서 자동 업데이트됨
 
 # Common labels for all resources
 commonLabels:
   app.kubernetes.io/component: backend
+<<<<<<< Updated upstream
   app.kubernetes.io/managed-by: terraform
   app.kubernetes.io/name: seoul-portal
 
@@ -30,3 +35,10 @@ commonAnnotations:
 images:
 - name: 150502622488.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
   newTag: ae470f6-20251201-054349
+=======
+  app.kubernetes.io/managed-by: argocd
+
+# Common annotations
+commonAnnotations:
+  description: "Seoul Portal Backend Application - Managed by ArgoCD + Kustomize"
+>>>>>>> Stashed changes

@@ -1,7 +1,7 @@
 # Seoul Portal – terraform.tfvars 예시
 
 # ===== AWS 계정 =====
-aws_account_id = "299145660695"
+aws_account_id = "150502622488"
 
 # ===== 네트워크 =====
 # VPC를 새로 생성하려면 vpc_id를 빈 문자열로 설정
@@ -113,7 +113,8 @@ db_port              = 5432
 # ===== ArgoCD =====
 # GitOps 배포를 사용하려면 true로 설정
 # 주의: EKS 클러스터가 생성된 후에만 true로 설정하세요
-# ArgoCD 설정
+# 1단계: enable_argocd=true, argocd_repo_url="" (ArgoCD Helm만 설치) ✅
+# 2단계: argocd_repo_url 입력 후 다시 apply (Application 생성) ← 지금!
 enable_argocd = true
 
 # ArgoCD 도메인 (선택사항)
@@ -122,13 +123,12 @@ argocd_domain = "" # 예: "argocd.example.com"
 # GitHub Repository 설정
 argocd_repo_url     = "https://github.com/minlnim/project.git"
 argocd_repo_branch  = "main"
-argocd_backend_path = "k8s/overlays/prod"
+argocd_backend_path = "seoul/k8s/overlays/prod"
 
 # Private Repository 접근 (필요시)
 argocd_repo_username = ""
 argocd_repo_password = ""
 
 # ===== CloudFront =====
-# CloudFront는 remote state에서 자동으로 가져옵니다
-# 수동으로 설정이 필요한 경우에만 아래 값 사용
-# existing_cloudfront_id = ""
+# 기존에 배포된 CloudFront Distribution ID 입력
+existing_cloudfront_id = "E152R78VFY6VWL"  # 실제 CloudFront Distribution ID로 변경 필요

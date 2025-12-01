@@ -38,13 +38,25 @@ resource "helm_release" "argocd" {
   namespace  = kubernetes_namespace.argocd[0].metadata[0].name
   version    = "5.51.6"
   
-  timeout       = 900  # 15분으로 증가
-  wait          = true
-  wait_for_jobs = true
+  timeout         = 900  # 15분으로 증가
+  wait            = true
+  wait_for_jobs   = true
+  create_namespace = false
+  skip_crds       = false  # CRD 설치 활성화
   
   # 실패 시 자동 재시도
-  atomic        = false
+  atomic          = false
   cleanup_on_fail = false
+
+  set {
+    name  = "crds.install"
+    value = "true"
+  }
+
+  set {
+    name  = "crds.keep"
+    value = "false"
+  }
 
   values = [
     yamlencode({
@@ -112,6 +124,15 @@ resource "helm_release" "argocd" {
   ]
 }
 
+# Wait for ArgoCD CRDs to be installed
+resource "time_sleep" "wait_for_argocd_crds" {
+  count = var.enable_argocd ? 1 : 0
+
+  depends_on = [helm_release.argocd]
+
+  create_duration = "120s"
+}
+
 # ArgoCD Admin Password Secret (초기 비밀번호 설정)
 resource "random_password" "argocd_admin" {
   count = var.enable_argocd ? 1 : 0
@@ -121,50 +142,78 @@ resource "random_password" "argocd_admin" {
 }
 
 # ArgoCD Application for Backend
-# 주의: kubectl로 수동 생성 필요
-# resource "kubernetes_manifest" "argocd_app_backend" {
-#   count = var.enable_argocd && var.argocd_repo_url != "" ? 1 : 0
-# 
-#   manifest = {
-#     apiVersion = "argoproj.io/v1alpha1"
-#     kind       = "Application"
-#     metadata = {
-#       name      = "${local.project}-backend"
-#       namespace = kubernetes_namespace.argocd[0].metadata[0].name
-#       finalizers = [
-#         "resources-finalizer.argocd.argoproj.io"
-#       ]
-#     }
-#     spec = {
-#       project = "default"
-# 
-#       source = {
-#         repoURL        = var.argocd_repo_url
-#         targetRevision = var.argocd_repo_branch
-#         path           = var.argocd_backend_path
-#       }
-# 
-#       destination = {
-#         server    = "https://kubernetes.default.svc"
-#         namespace = "default"
-#       }
-# 
-#       syncPolicy = {
-#         automated = {
-#           prune    = true
-#           selfHeal = true
-#         }
-#         syncOptions = [
-#           "CreateNamespace=true"
-#         ]
-#       }
-#     }
-#   }
-# 
-#   depends_on = [
-#     helm_release.argocd[0]
-#   ]
-# }
+resource "kubernetes_manifest" "argocd_app_backend" {
+  count = var.enable_argocd && var.argocd_repo_url != "" ? 1 : 0
+
+  depends_on = [
+    helm_release.argocd,
+    time_sleep.wait_for_argocd_crds
+  ]
+
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "${local.project}-backend"
+      namespace = kubernetes_namespace.argocd[0].metadata[0].name
+      finalizers = [
+        "resources-finalizer.argocd.argoproj.io"
+      ]
+    }
+    spec = {
+      project = "default"
+
+      source = {
+        repoURL        = var.argocd_repo_url
+        targetRevision = var.argocd_repo_branch
+        path           = var.argocd_backend_path
+        
+        # Kustomize 사용 설정
+        kustomize = {
+          namePrefix = ""
+          nameSuffix = ""
+        }
+      }
+
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "default"
+      }
+
+      syncPolicy = {
+        automated = {
+          prune    = true    # Git에서 삭제된 리소스 자동 삭제
+          selfHeal = true    # 클러스터에서 수동 변경 시 자동 복원
+        }
+        syncOptions = [
+          "CreateNamespace=true",
+          "PruneLast=true"
+        ]
+        retry = {
+          limit = 5
+          backoff = {
+            duration    = "5s"
+            factor      = 2
+            maxDuration = "3m"
+          }
+        }
+      }
+
+      # 무시할 차이점 설정 (노이즈 제거)
+      ignoreDifferences = [
+        {
+          group = "apps"
+          kind  = "Deployment"
+          jsonPointers = [
+            "/spec/replicas"  # HPA 사용 시 replicas 차이 무시
+          ]
+        }
+      ]
+    }
+  }
+
+
+}
 
 # ArgoCD Repository Secret (Private Repo용)
 resource "kubernetes_secret" "argocd_repo" {

@@ -523,50 +523,60 @@ resource "aws_apigatewayv2_stage" "default" {
 # 7. Kubernetes ConfigMap for Backend
 ########################################
 
-resource "kubernetes_config_map" "backend" {
-  metadata {
-    name      = "backend-config"
-    namespace = "default"
-  }
+# ⚠️ 애플리케이션 배포는 ArgoCD + Kustomize로 관리됨
+# Terraform은 인프라(EKS, VPC, RDS, Cognito 등)만 관리
+# K8s 리소스는 tokyo/k8s/base/에서 관리됨
 
-  data = {
-    DB_HOST              = local.db_endpoint
-    DB_PORT              = tostring(local.db_port)
-    DB_NAME              = var.db_name
-    DB_USER              = var.db_username
-    COGNITO_REGION       = var.aws_region
-    COGNITO_USER_POOL_ID = aws_cognito_user_pool.tokyo.id
-    COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.tokyo_spa.id
-    API_PORT             = "8080"
-  }
+# GitOps 흐름:
+# 1. Ops가 tokyo/k8s/base/ 매니페스트 수정 → Git Push
+# 2. GitHub Actions가 Docker Build → ECR Push → Kustomize 이미지 태그 업데이트
+# 3. ArgoCD가 Git 변경 감지 → 자동 배포
 
-  depends_on = [
-    module.eks
-  ]
-}
+# resource "kubernetes_config_map" "backend" {
+  # metadata {
+  #   name      = "backend-config"
+  #   namespace = "default"
+  # }
 
-resource "kubernetes_secret" "backend" {
-  metadata {
-    name      = "backend-secret"
-    namespace = "default"
-  }
+#   data = {
+#     DB_HOST              = local.db_endpoint
+#     DB_PORT              = tostring(local.db_port)
+#     DB_NAME              = var.db_name
+#     DB_USER              = var.db_username
+#     COGNITO_REGION       = var.aws_region
+#     COGNITO_USER_POOL_ID = aws_cognito_user_pool.tokyo.id
+#     COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.tokyo_spa.id
+#     API_PORT             = "8080"
+#   }
+# 
+#   depends_on = [
+#     module.eks
+#   ]
+# }
 
-  data = {
-    DB_PASSWORD = var.db_password
-  }
-
-  type = "Opaque"
-
-  depends_on = [
-    module.eks
-  ]
-}
+# resource "kubernetes_secret" "backend" {
+#   metadata {
+#     name      = "backend-secret"
+#     namespace = "default"
+#   }
+# 
+#   data = {
+#     DB_PASSWORD = var.db_password
+#   }
+# 
+#   type = "Opaque"
+# 
+#   depends_on = [
+#     module.eks
+#   ]
+# }
 
 ########################################
 # 8. Kubernetes Deployment for Backend
 ########################################
-# ECR에 이미지 푸시 후 kubectl apply로 배포
-# GitHub Actions로 자동 배포 예정
+
+# ⚠️ 애플리케이션 배포는 ArgoCD + Kustomize로 관리됨
+# Terraform은 인프라만 관리하고, 배포는 GitOps 파이프라인에 위임
 
 # resource "kubernetes_deployment" "backend" {
 #   metadata {
@@ -742,35 +752,36 @@ resource "kubernetes_secret" "backend" {
 # 9. Kubernetes Service for Backend
 ########################################
 
-resource "kubernetes_service" "backend" {
-  metadata {
-    name      = "backend"
-    namespace = "default"
-    labels = {
-      app = "backend"
-    }
-  }
-
-  spec {
-    selector = {
-      app = "backend"
-    }
-
-    port {
-      port        = 8080
-      target_port = 8080
-      protocol    = "TCP"
-      name        = "http"
-    }
-
-    type = "ClusterIP"
-  }
-
-  depends_on = [
-    kubernetes_config_map.backend,
-    kubernetes_secret.backend
-  ]
-}
+# ⚠️ ArgoCD + Kustomize로 관리됨
+# resource "kubernetes_service" "backend" {
+#   metadata {
+#     name      = "backend"
+#     namespace = "default"
+#     labels = {
+#       app = "backend"
+#     }
+#   }
+# 
+#   spec {
+#     selector = {
+#       app = "backend"
+#     }
+# 
+#     port {
+#       port        = 8080
+#       target_port = 8080
+#       protocol    = "TCP"
+#       name        = "http"
+#     }
+# 
+#     type = "ClusterIP"
+#   }
+# 
+#   depends_on = [
+#     kubernetes_config_map.backend,
+#     kubernetes_secret.backend
+#   ]
+# }
 
 ########################################
 # 10. TargetGroupBinding for AWS Load Balancer Controller

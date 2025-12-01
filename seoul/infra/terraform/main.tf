@@ -528,7 +528,15 @@ resource "aws_apigatewayv2_stage" "default" {
 # 7. Kubernetes ConfigMap for Backend
 ########################################
 
-# GitHub Actions가 kubectl apply로 배포하므로 Terraform에서는 제거
+# ⚠️ 애플리케이션 배포는 ArgoCD + Kustomize로 관리됨
+# Terraform은 인프라(EKS, VPC, RDS, Cognito 등)만 관리
+# K8s 리소스는 seoul/k8s/base/에서 관리됨
+
+# GitOps 흐름:
+# 1. Ops가 seoul/k8s/base/ 매니페스트 수정 → Git Push
+# 2. GitHub Actions가 Docker Build → ECR Push → Kustomize 이미지 태그 업데이트
+# 3. ArgoCD가 Git 변경 감지 → 자동 배포
+
 # resource "kubernetes_config_map" "backend" {
 #   metadata {
 #     name      = "backend-config"
@@ -572,6 +580,8 @@ resource "aws_apigatewayv2_stage" "default" {
 # 8. Kubernetes Deployment for Backend
 ########################################
 
+# ⚠️ 애플리케이션 배포는 ArgoCD + Kustomize로 관리됨
+# Terraform은 인프라만 관리하고, 배포는 GitOps 파이프라인에 위임
 # GitHub Actions가 kubectl apply로 배포하므로 Terraform에서는 제거
 # resource "kubernetes_deployment" "backend" {
 #   metadata {
