@@ -30,6 +30,7 @@ cognito_logout_urls = [
 # ===== CORS =====
 cors_allowed_origins = [
   "http://localhost:3000",
+  "http://seoul-webapp-env.eba-pj4n2y8k.ap-northeast-2.elasticbeanstalk.com",
   "http://seoul-webapp-env.eba-ccpra5ej.ap-northeast-2.elasticbeanstalk.com",
   "https://dj5k42sej4rz6.cloudfront.net",
   "https://d2msw6fd56l45o.cloudfront.net"
