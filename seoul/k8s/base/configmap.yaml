@@ -4,7 +4,7 @@ metadata:
   name: backend-config
   namespace: default
 data:
-  DB_HOST: "aurora-global-seoul-writer.czky26wqm1co.ap-northeast-2.rds.amazonaws.com"
+  DB_HOST: "aurora-global-seoul-cluster.cluster-czky26wqm1co.ap-northeast-2.rds.amazonaws.com"
   DB_PORT: "3306"
   DB_NAME: "corpportal"
   AWS_REGION: "ap-northeast-2"
