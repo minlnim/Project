@@ -18,13 +18,11 @@ cognito_domain_prefix = "corp-portal-tokyo-demo"
 # 로그인/로그아웃 URL (API Gateway 도메인으로 설정 예정)
 cognito_callback_urls = [
   "http://localhost:3000/callback",
-  "http://tokyo-webapp-env.eba-nnrskanr.ap-northeast-1.elasticbeanstalk.com/callback",
   "https://d2msw6fd56l45o.cloudfront.net/callback"
 ]
 
 cognito_logout_urls = [
   "http://localhost:3000/",
-  "http://tokyo-webapp-env.eba-nnrskanr.ap-northeast-1.elasticbeanstalk.com/",
   "https://d2msw6fd56l45o.cloudfront.net/"
 ]
 
