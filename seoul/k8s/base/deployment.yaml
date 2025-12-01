@@ -14,8 +14,8 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: 299145660695.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend:latest
+      - name: backend-app
+        image: 150502622488.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend:v1.0.0
         ports:
         - containerPort: 8080
         env:

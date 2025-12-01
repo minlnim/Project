@@ -6,12 +6,6 @@ namespace: default
 resources:
   - ../../base
 
-# Docker 이미지 설정
-images:
-  - name: 299145660695.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
-    newName: 150502622488.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
-    newTag: v1.0.0
-
 # Production 환경 설정 오버라이드
 patchesStrategicMerge:
   - replica-patch.yaml
