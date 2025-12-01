@@ -7,8 +7,6 @@ resources:
   - ../../base
 
 # Production 환경 설정 오버라이드
-patchesStrategicMerge:
-  - replica-patch.yaml
 
 # Production용 리소스 제한
 patchesJson6902:
