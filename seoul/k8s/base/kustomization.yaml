@@ -4,41 +4,23 @@ kind: Kustomization
 namespace: default
 
 resources:
-<<<<<<< Updated upstream
-- namespace.yaml
-- configmap.yaml
-- secret.yaml
-- deployment.yaml
-- service.yaml
-=======
+  - namespace.yaml
   - configmap.yaml
   - secret.yaml
   - deployment.yaml
   - service.yaml
->>>>>>> Stashed changes
-
-# 이미지 태그를 동적으로 업데이트 (GitHub Actions에서 수행)
-images:
-  - name: 299145660695.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
-    newTag: latest  # CI/CD에서 자동 업데이트됨
 
 # Common labels for all resources
 commonLabels:
   app.kubernetes.io/component: backend
-<<<<<<< Updated upstream
-  app.kubernetes.io/managed-by: terraform
+  app.kubernetes.io/managed-by: argocd
   app.kubernetes.io/name: seoul-portal
 
 # Common annotations
 commonAnnotations:
-  description: Seoul Portal Backend Application - Managed by Terraform
-images:
-- name: 150502622488.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
-  newTag: ae470f6-20251201-054349
-=======
-  app.kubernetes.io/managed-by: argocd
-
-# Common annotations
-commonAnnotations:
   description: "Seoul Portal Backend Application - Managed by ArgoCD + Kustomize"
->>>>>>> Stashed changes
+
+# 이미지 태그를 동적으로 업데이트 (GitHub Actions에서 수행)
+images:
+  - name: 150502622488.dkr.ecr.ap-northeast-2.amazonaws.com/seoul-portal-seoul-backend
+    newTag: v20251201-062823
