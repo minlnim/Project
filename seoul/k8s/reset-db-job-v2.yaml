@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: reset-database
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql-reset
+        image: mysql:8.0
+        command:
+        - /bin/bash
+        - -c
+        - |
+          cat > /tmp/reset.sql <<'EOSQL'
+          SET NAMES utf8mb4;
+          SET CHARACTER SET utf8mb4;
+          
+          SET FOREIGN_KEY_CHECKS = 0;
+          TRUNCATE TABLE approvals;
+          TRUNCATE TABLE notices;
+          TRUNCATE TABLE employees;
+          SET FOREIGN_KEY_CHECKS = 1;
+          
+          INSERT INTO employees (email, name, department, position, phone) VALUES
+              ('ceo@company.com', '홍길동', '경영진', '대표이사', '010-1234-5678'),
+              ('cto@company.com', '김철수', '기술본부', '기술이사', '010-2345-6789'),
+              ('manager1@company.com', '이영희', '개발팀', '팀장', '010-3456-7890'),
+              ('dev1@company.com', '박민수', '개발팀', '선임개발자', '010-4567-8901'),
+              ('dev2@company.com', '최지혜', '개발팀', '주임개발자', '010-5678-9012'),
+              ('hr@company.com', '정수현', '인사팀', '팀장', '010-6789-0123');
+          
+          UPDATE employees SET manager_id = (SELECT id FROM (SELECT id FROM employees WHERE email = 'ceo@company.com') AS t1)
+          WHERE email IN ('cto@company.com', 'hr@company.com');
+          
+          UPDATE employees SET manager_id = (SELECT id FROM (SELECT id FROM employees WHERE email = 'cto@company.com') AS t2)
+          WHERE email = 'manager1@company.com';
+          
+          UPDATE employees SET manager_id = (SELECT id FROM (SELECT id FROM employees WHERE email = 'manager1@company.com') AS t3)
+          WHERE email IN ('dev1@company.com', 'dev2@company.com');
+          EOSQL
+          
+          mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD corpportal < /tmp/reset.sql
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: DB_HOST
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: DB_PASSWORD
