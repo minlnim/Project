@@ -11,7 +11,7 @@ resources:
 
 # 이미지 태그를 동적으로 업데이트 (GitHub Actions에서 수행)
 images:
-  - name: 299145660695.dkr.ecr.ap-northeast-1.amazonaws.com/tokyo-portal-tokyo-backend
+  - name: 150502622488.dkr.ecr.ap-northeast-1.amazonaws.com/tokyo-portal-tokyo-backend
     newTag: latest  # CI/CD에서 자동 업데이트됨
 
 # Common labels for all resources

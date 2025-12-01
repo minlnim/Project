@@ -131,7 +131,7 @@ jobs:
             --environment-name seoul-webapp-env \
             --version-label ${VERSION_LABEL} \
             --option-settings \
-              Namespace=aws:elasticbeanstalk:application:environment,OptionName=API_GATEWAY_URL,Value=https://qfxxv3hll3.execute-api.ap-northeast-2.amazonaws.com \
+              Namespace=aws:elasticbeanstalk:application:environment,OptionName=API_GATEWAY_URL,Value=https://tnuq8drlck.execute-api.ap-northeast-2.amazonaws.com \
               Namespace=aws:elasticbeanstalk:application:environment,OptionName=COGNITO_REGION,Value=${{ env.AWS_REGION }} \
               Namespace=aws:elasticbeanstalk:application:environment,OptionName=COGNITO_USER_POOL_ID,Value=ap-northeast-2_DCWcuUQjO \
               Namespace=aws:elasticbeanstalk:application:environment,OptionName=COGNITO_CLIENT_ID,Value=5l8mhakqhkt7679noep6k5vu89
