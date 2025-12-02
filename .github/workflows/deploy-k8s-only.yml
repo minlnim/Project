@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'seoul/k8s/**'
-  workflow_dispatch:
+  # workflow_dispatch 제거 - 수동 실행 버튼 안 뜸
 
 jobs:
   notify-argocd:

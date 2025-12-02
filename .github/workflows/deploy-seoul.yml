@@ -1,13 +1,14 @@
-name: Deploy Seoul Backend & Frontend
+name: Deploy Seoul Backend & Frontend (Disabled)
 
 on:
-  # push:  # 주석 처리하여 자동 실행 비활성화
+  # 완전히 비활성화 - 자동/수동 모두 실행 안 됨
+  # push:
   #   branches:
   #     - main
   #   paths:
   #     - 'seoul/backend/**'
   #     - 'seoul/frontend/**'
-  workflow_dispatch:  # 수동 실행만 가능
+  # workflow_dispatch:
 
 env:
   AWS_REGION: ap-northeast-2
