@@ -1,14 +1,15 @@
 name: Deploy Seoul Backend & Frontend (Disabled)
 
+# 이 workflow는 비활성화되었습니다
+# 필요시 아래 주석을 해제하여 사용하세요
 on:
-  # 완전히 비활성화 - 자동/수동 모두 실행 안 됨
+  workflow_dispatch:  # 최소한 하나의 trigger 필요 (수동 실행만)
   # push:
   #   branches:
   #     - main
   #   paths:
   #     - 'seoul/backend/**'
   #     - 'seoul/frontend/**'
-  # workflow_dispatch:
 
 env:
   AWS_REGION: ap-northeast-2
