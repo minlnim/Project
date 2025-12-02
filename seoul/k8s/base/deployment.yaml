@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: default
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: backend
@@ -59,6 +59,8 @@ spec:
             configMapKeyRef:
               name: backend-config
               key: COGNITO_CLIENT_ID
+        - name: TEST_ENV
+          value: "demo-v1"
         resources:
           requests:
             cpu: 250m
